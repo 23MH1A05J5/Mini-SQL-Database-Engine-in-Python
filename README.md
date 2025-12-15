@@ -1,268 +1,305 @@
-Mini SQL Database Engine in Python
+# Mini SQL Database Engine in Python
 
-Overview
+## Overview
 
-    This project is a simplified, in‑memory SQL query engine implemented in Python.
-    It loads data from a user‑specified CSV file, parses a small subset of SQL, and executes the query on the rows stored in memory.
-    The goal is to demystify what happens inside a database when you run a basic SELECT query and to practice data parsing, filtering, and aggregation logic.
+This project is a simplified, **in-memory SQL query engine** implemented
+in Python.
 
-Key features:
+It loads data from a user-specified CSV file, parses a small subset of
+SQL, and executes the query on rows stored entirely in memory.
 
-    Load a CSV file into memory as a list of dictionaries (one dict per row).
+The goal of this project is to: - Demystify how a database processes
+basic `SELECT` queries - Practice data parsing, filtering, and
+aggregation logic - Understand query execution without relying on an
+actual database engine
 
-    Support for SELECT, FROM, an optional single‑condition WHERE clause, and COUNT aggregation.
+------------------------------------------------------------------------
 
-    A simple command‑line REPL where the user can type SQL‑like queries.
+## Key Features
 
-    Clear error messages for invalid syntax, missing columns, or unsupported queries.
+-   Load a CSV file into memory as a list of dictionaries (one
+    dictionary per row)
+-   Support for `SELECT`, `FROM`, optional single-condition `WHERE`, and
+    `COUNT` aggregation
+-   Interactive command-line REPL for executing SQL-like queries
+-   Clear and user-friendly error messages for invalid syntax and
+    unsupported queries
 
-Project Structure
+------------------------------------------------------------------------
 
-mini_sql_engine/
-    cli.py # Command-line REPL, entry point
-    parser.py # Very small SQL parser for a restricted grammar
-    engine.py # In-memory execution engine on top of CSV data
-    Dockerfile # Container image definition
+## Project Structure
+
+    mini_sql_engine/
+    │
+    ├── cli.py            # Command-line REPL, entry point
+    ├── parser.py         # Small SQL parser for restricted grammar
+    ├── engine.py         # In-memory query execution engine
+    ├── Dockerfile        # Container image definition
+    ├── employees.csv
+    ├── sales.csv
+    ├── sensors.csv
+    ├── users.csv
+    ├── mixed_types.csv
+    └── README.md
+
+Additional CSV files are included to test different scenarios.
+
+------------------------------------------------------------------------
+
+## Setup and Running the CLI
+
+### Prerequisites
+
+-   Python **3.11 or later**
+-   Docker (optional, for containerized execution)
+
+------------------------------------------------------------------------
+
+### 1. Running Locally with Python
+
+Clone the repository and navigate to the project directory:
+
+``` bash
+git clone https://github.com/23MH1A05L3/Build-a-Library-Management-System-API.git
+cd mini_sql_engine
+```
+
+Ensure the CSV files you want to query (e.g., `employees.csv`,
+`sales.csv`) are in the same directory as `cli.py`.
+
+Start the CLI:
+
+``` bash
+python cli.py
+```
+
+When prompted, enter the CSV filename:
+
     employees.csv
-    sales.csv
-    sensors.csv
-    users.csv
-    mixed_types.csv
-    README.md
 
-More CSV files are included for testing different scenarios.
-
-Setup and Running the CLI
-
-Prerequisites:
-
-  Python 3.11 or later installed on your machine.
-
-  Docker installed if you want to run the project in a container.
-
-  1.Running locally with Python
-
-    Clone the GitHub repository and go into the project folder:
-
-    git clone https://github.com/23MH1A05L3/Build-a-Library-Management-System-API.git
-    cd mini_sql_engine
-
-    Ensure the CSV files you want to query (for example employees.csv or sales.csv) are in the same folder as cli.py.
-
-    Start the CLI:
-
-    python cli.py
-
-    When prompted for the CSV path, type the filename, for example:
-
-    employees.csv
-
-    You will then see a prompt like:
+You will see the prompt:
 
     mini-sql>
 
-    Enter SQL queries in the supported grammar (see next section).
-    Type exit or quit to close the REPL.
+-   Enter SQL queries using the supported grammar
+-   Type `exit` or `quit` to leave the REPL
 
-2.Running in Docker
+------------------------------------------------------------------------
 
-    Build the image
+### 2. Running with Docker
 
-    From the mini_sql_engine folder (where the Dockerfile is):
+#### Build the Image
 
-    docker build -t mini-sql-engine .
+From the `mini_sql_engine` directory:
 
-    This creates a Docker image named mini-sql-engine containing the Python code.
+``` bash
+docker build -t mini-sql-engine .
+```
 
-    Run the container
+#### Run the Container
 
-      To allow the container to see and use the CSV files from the local project folder, mount the folder into /app.
+Mount the project directory so the container can access CSV files.
 
-      On Windows (cmd.exe or PowerShell) – replace the path with the actual project path:
+**Windows (PowerShell / CMD):**
 
-          docker run -it -v "<project_folder-path>":/app mini-sql-engine
+``` bash
+docker run -it -v "<project_folder_path>":/app mini-sql-engine
+```
 
-      On macOS / Linux (if needed):
+**macOS / Linux:**
 
-          docker run -it -v "$PWD":/app mini-sql-engine
+``` bash
+docker run -it -v "$PWD":/app mini-sql-engine
+```
 
-    The container will automatically run:
+The container automatically runs:
 
-      python cli.py
+``` bash
+python cli.py
+```
 
-    Inside the CLI:
-      Enter the CSV file name, for example:
-        employees.csv
+Inside the CLI: - Enter the CSV filename (e.g., `employees.csv`) - Run
+SQL queries at the `mini-sql>` prompt - Type `exit` or `quit` to stop
+the container
 
-    Type your SQL queries at the mini-sql> prompt.
+------------------------------------------------------------------------
 
-    Type exit or quit to stop the container.
+## Supported SQL Grammar
 
-Supported SQL Grammar :
+The engine supports only a **restricted subset of SQL**. Unsupported
+syntax produces clear error messages.
 
-    The engine intentionally supports only a small, well‑defined subset of SQL.
-    Anything outside this subset should produce a clear error message rather than silently doing the wrong thing.
+### General Form
 
-General form:
+``` sql
+SELECT <select_list>
+FROM <table_name>
+[WHERE <column> <operator> <value>];
+```
 
-    SELECT <select_list>
-    FROM <table_name>
-    [WHERE <column> <operator> <value>];
+-   `<table_name>` is the CSV filename **without `.csv`**
+-   Only **one table** can be queried at a time
+-   `WHERE` supports **only one condition**
 
-    <table_name> is the CSV filename without .csv (for employees.csv, the table name is employees).
-    Only one table can be queried at a time.
-    The WHERE clause is optional and supports only a single condition (no AND / OR / NOT).
+------------------------------------------------------------------------
 
-SELECT (projection)
+## SELECT (Projection)
 
-Supported forms:
+### Supported Forms
 
-    Select all columns:
+**Select all columns**
 
-    SELECT * FROM employees;
+``` sql
+SELECT * FROM employees;
+```
 
-    Select specific columns (comma‑separated list):
+**Select specific columns**
 
-    SELECT id, name, country FROM employees;
+``` sql
+SELECT id, name, country FROM employees;
+```
 
-Rules:
+### Rules
 
-    Column names must exactly match CSV headers.
+-   Column names must exactly match CSV headers
 
-    If any selected column does not exist, the engine returns an error such as
-    “Selected column not found: <name>”.
+-   Non-existent columns produce:
 
-    FROM (table name)
+        Selected column not found: <name>
 
-    The table name is derived from the CSV filename without extension.
+------------------------------------------------------------------------
 
-    If the user loads users.csv, the valid table name in queries is users.
+## FROM (Table Name)
 
-    If a query references an unknown table, the engine returns an error
-    such as “Unknown table: <name>”.
+-   Table name comes from the CSV filename without extension
 
-Example: (assuming users.csv was the chosen file).
+-   Unknown tables produce:
 
+        Unknown table: <name>
+
+Example:
+
+``` sql
 SELECT * FROM users;
+```
 
-WHERE (filtering with a single condition) :
+------------------------------------------------------------------------
 
-    Supported pattern:
+## WHERE (Filtering)
 
-    WHERE <column> <operator> <value>
+### Supported Pattern
 
-        Only one condition is allowed (no AND/OR).
+``` sql
+WHERE <column> <operator> <value>
+```
 
-    Supported comparison operators:
-                                      =
-                                      !=
-                                      <
-                                      =
-                                      <=
+### Supported Operators
 
-    Values can be:
+-   `=`
+-   `!=`
+-   `>`
+-   `<`
+-   `>=`
+-   `<=`
 
-      Numbers: age > 30, salary >= 70000.5
-      Quoted strings: country = 'India', status = "PAID"
+### Value Types
 
-    Examples:
+-   Numbers: `age > 30`
+-   Strings: `country = 'India'`
 
-      SELECT * FROM employees WHERE country = 'India';
-      SELECT name, age FROM employees WHERE age > 30;
-      SELECT * FROM sales WHERE amount >= 150.0;
+### Examples
 
-    If the column in the WHERE clause does not exist, the engine returns an error like
-        “Column in WHERE not found: <name>”.
+``` sql
+SELECT * FROM employees WHERE country = 'India';
+SELECT name, age FROM employees WHERE age > 30;
+SELECT * FROM sales WHERE amount >= 150.0;
+```
 
-    If the operator is not supported, the engine returns an error like
-        “Unsupported operator in WHERE (allowed: =, !=, >, <, >=, <=)”.
+### Errors
 
-Aggregation: COUNT
+-   Missing column:
 
-  The engine supports COUNT as a simple aggregation over the filtered rows.
+        Column in WHERE not found: <name>
 
-  Supported forms:
+-   Unsupported operator:
 
-    Count all rows:
+        Unsupported operator in WHERE
 
-        SELECT COUNT() FROM employees;
-        SELECT COUNT() FROM employees WHERE country = 'India';
+------------------------------------------------------------------------
 
-    Count non‑null, non‑empty values in a column:
+## Aggregation: COUNT
 
-        SELECT COUNT(age) FROM employees;
-        SELECT COUNT(credit_balance) FROM users WHERE is_premium = 'True';
+### Supported Forms
 
-  Rules:
+**Count all rows**
 
-    COUNT(*) returns the total number of rows that pass the WHERE filter.
+``` sql
+SELECT COUNT(*) FROM employees;
+SELECT COUNT(*) FROM employees WHERE country = 'India';
+```
 
-    COUNT(column) returns how many rows have a non‑empty value for that column after filtering.
+**Count non-empty column values**
 
-    If the column in COUNT(column) does not exist, the engine returns an error such as
-    “Column not found for COUNT: <name>”.
+``` sql
+SELECT COUNT(age) FROM employees;
+SELECT COUNT(credit_balance) FROM users WHERE is_premium = 'True';
+```
 
-  Unsupported Queries:
+### Rules
 
-    To keep the project simple, the following are not supported and should result in clear error messages or rejection:
+-   `COUNT(*)` → total filtered rows
 
-      JOINs, GROUP BY, ORDER BY, LIMIT, INSERT, UPDATE, DELETE.
+-   `COUNT(column)` → non-empty values only
 
-      Multiple tables in a single query.
+-   Missing column:
 
-      Multiple conditions in WHERE (no AND, OR, NOT).
+        Column not found for COUNT: <name>
 
-      Functions other than COUNT.
+------------------------------------------------------------------------
 
-      Aliases, subqueries, or nested SELECTs.
+## Unsupported Queries
 
-Example Queries :
+The following are intentionally **not supported**:
 
-Assuming employees.csv is loaded (table name employees):
+-   JOIN, GROUP BY, ORDER BY, LIMIT
+-   INSERT, UPDATE, DELETE
+-   Multiple tables in one query
+-   Multiple WHERE conditions (AND / OR / NOT)
+-   Functions other than COUNT
+-   Aliases, subqueries, nested SELECTs
 
-    -- Select all columns
-    SELECT * FROM employees;
+------------------------------------------------------------------------
 
-    -- Select specific columns
-    SELECT name, age, country FROM employees;
+## Example Queries
 
-    -- Filter by numeric condition
-    SELECT * FROM employees WHERE age > 30;
+``` sql
+SELECT * FROM employees;
+SELECT name, age, country FROM employees;
+SELECT * FROM employees WHERE age > 30;
+SELECT COUNT(*) FROM employees;
+SELECT COUNT(salary) FROM employees WHERE is_full_time = 'True';
+```
 
-    -- Filter by string condition
-    SELECT name, department FROM employees WHERE country = 'India';
+------------------------------------------------------------------------
 
-    -- Count all rows
-    SELECT COUNT(*) FROM employees;
+## Example Error Queries
 
-    -- Count non-null salaries for a subset
-    SELECT COUNT(salary) FROM employees WHERE is_full_time = 'True';
+``` sql
+SELECT name, age WHERE age > 30;
+SELECT foo FROM employees;
+SELECT * FROM employees WHERE foo = 'X';
+SELECT * FROM employees WHERE age >> 30;
+```
 
-Example error‑testing queries:
+------------------------------------------------------------------------
 
-    -- Syntax error: missing FROM
-    SELECT name, age WHERE age > 30;
+## Error Handling Behavior
 
-    -- Non-existent column in SELECT
-    SELECT foo FROM employees;
+The engine is designed to **fail fast and clearly**:
 
-    -- Non-existent column in WHERE
-    SELECT * FROM employees WHERE foo = 'X';
+-   Invalid syntax → descriptive error message
+-   Missing table or column → explicit error
+-   Internal issues → generic error (no Python traceback)
 
-    -- Unsupported operator
-    SELECT * FROM employees WHERE age >> 30;
-
-Error Handling Behaviour : 
-
-    The engine aims to fail fast and clearly when the user enters unsupported or incorrect SQL:
-
-    Invalid syntax (missing FROM, bad SELECT list, empty WHERE, unsupported operator)
-    → “Invalid ...” / “Missing ...” style messages.
-
-    Non‑existent table or column
-    → “Unknown table: <name>” or “Selected column not found: <name>”.
-
-    Unexpected internal issues
-    → generic error message instead of a Python traceback.
-
-  This ensures the CLI does not crash and gives helpful feedback to the user while staying within the restricted SQL grammar defined above.
+This keeps the CLI stable and user-friendly while enforcing a strict SQL
+subset.
