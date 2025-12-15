@@ -1,0 +1,6 @@
+id,name,age,country,department,salary,is_full_time
+1,Alice,25,USA,Engineering,70000.50,True
+2,Bob,35,India,Engineering,90000.00,True
+3,Charlie,40,USA,HR,60000.75,False
+4,Diana,29,UK,Marketing,65000.00,True
+5,Eva,22,India,Support,40000.25,False

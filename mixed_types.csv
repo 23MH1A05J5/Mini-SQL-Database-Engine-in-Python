@@ -1,0 +1,6 @@
+id,category,value_int,value_float,value_bool,value_text
+1,A,10,10.5,True,foo
+2,A,0,0.0,False,bar
+3,B,-5,-5.25,True,baz
+4,B,100,100.01,False,
+5,C,42,42.42,True,hello

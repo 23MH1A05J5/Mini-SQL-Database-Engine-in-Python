@@ -1,0 +1,6 @@
+reading_id,device_id,temperature,humidity,is_active
+1,A,21.5,45.0,True
+2,A,22.0,48.5,True
+3,B,19.8,55.2,False
+4,B,20.1,50.0,False
+5,C,23.3,40.0,True
