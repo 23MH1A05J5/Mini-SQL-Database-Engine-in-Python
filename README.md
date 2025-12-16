@@ -88,28 +88,16 @@ You will see the prompt:
 
 ### 2. Running with Docker
 
-#### Build the Image
-
-From the `mini_sql_engine` directory:
+#### Pull the Image
 
 ``` bash
-docker build -t mini-sql-engine .
+docker pull ramapithani/mini-sql-engine
 ```
 
 #### Run the Container
 
-Mount the project directory so the container can access CSV files.
-
-**Windows (PowerShell / CMD):**
-
 ``` bash
-docker run -it -v "<project_folder_path>":/app mini-sql-engine
-```
-
-**macOS / Linux:**
-
-``` bash
-docker run -it -v "$PWD":/app mini-sql-engine
+docker run -it ramapithani/mini-sql-engine
 ```
 
 The container automatically runs:
@@ -325,4 +313,5 @@ The engine is designed to **fail fast and clearly**:
     
 This keeps the CLI stable and user-friendly while enforcing a strict SQL
 subset.
+
 
