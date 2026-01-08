@@ -60,7 +60,7 @@ Additional CSV files are included to test different scenarios.
 Clone the repository and navigate to the project directory:
 
 ``` bash
-git clone https://github.com/23MH1A05L3/Build-a-Library-Management-System-API.git
+git clone https://github.com/23MH1A05j5/Build-a-Library-Management-System-API.git
 cd mini_sql_engine
 ```
 
@@ -91,13 +91,13 @@ You will see the prompt:
 #### Pull the Image
 
 ``` bash
-docker pull ramapithani/mini-sql-engine
+docker pull harshitha/mini-sql-engine
 ```
 
 #### Run the Container
 
 ``` bash
-docker run -it ramapithani/mini-sql-engine
+docker run -it harshitha/mini-sql-engine
 ```
 
 The container automatically runs:
@@ -313,5 +313,6 @@ The engine is designed to **fail fast and clearly**:
     
 This keeps the CLI stable and user-friendly while enforcing a strict SQL
 subset.
+
 
 
